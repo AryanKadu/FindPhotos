@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: face-recognition-api
+    env: python
+    plan: starter          # upgrade to standard for more RAM (InsightFace needs ~1GB+)
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: QDRANT_URL
+        sync: false        # set manually in Render dashboard
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_COLLECTION
+        value: faces
+      - key: GOOGLE_SA_JSON
+        sync: false        # paste full JSON string in Render dashboard
+      - key: DRIVE_FOLDER_ID
+        sync: false
+      - key: DET_THRESHOLD
+        value: "0.5"
+      - key: SIM_THRESHOLD
+        value: "0.40"
