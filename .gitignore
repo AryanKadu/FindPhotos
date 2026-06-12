@@ -40,3 +40,12 @@ frontend/*.pem
 # generated native folders
 frontend/ios
 frontend/android
+
+# Backend (Python)
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/config.json
+backend/*.jpeg
+backend/*.jpg
+backend/*.png
