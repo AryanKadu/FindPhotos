@@ -61,7 +61,7 @@ DRIVE_FOLDER_ID = os.environ.get("DRIVE_FOLDER_ID", "")
 DET_THRESHOLD = float(os.environ.get("DET_THRESHOLD", "0.5"))
 # SIM_THRESHOLD is now read from config.json (fallback to 0.40)
 EMBEDDING_DIM = 512
-WORKER_THREADS = int(os.environ.get("WORKER_THREADS", "2"))  # parallel download workers
+WORKER_THREADS = int(os.environ.get("WORKER_THREADS", "1"))  # 1 thread prevents OOM on 512MB free tiers
 IMAGE_MIMETYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp", "image/heic", "image/heif"}
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
@@ -353,9 +353,17 @@ def _process_drive_file(file_id: str, filename: str, subfolder: str, event_id: s
                 "filename": filename,
             }))
         _upsert_faces_batch(pairs)  # single HTTP call for all faces in this image
+        
+        # Aggressive garbage collection to keep 512MB RAM instances from crashing
+        del raw, img, embeddings, pairs
+        import gc
+        gc.collect()
+        
         return len(pairs)
     except Exception as e:
         logger.error(f"Error processing {filename}: {e}")
+        import gc
+        gc.collect()
         return 0
 
 
