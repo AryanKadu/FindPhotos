@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   View,
+  Platform,
   type GestureResponderEvent,
   type ListRenderItemInfo,
 } from 'react-native';
@@ -204,6 +205,11 @@ export default function OrganizerScreen() {
       try {
         await deleteEvent(isAll ? undefined : activeEventId);
         alert(isAll ? 'All database data wiped!' : 'Event deleted');
+        
+        // Reset UI state completely
+        setFolderData(null);
+        setIngestProgress(null);
+        
         loadStats();
         loadGalleryPage(0);
       } catch (e) {
@@ -297,7 +303,7 @@ export default function OrganizerScreen() {
           <View style={{ alignItems: 'center', marginVertical: 16 }}>
             <View style={{ padding: 16, backgroundColor: '#fff', borderRadius: 12 }}>
               <QRCode
-                value={`exp://localhost:8081/--/attendee?event=${activeEventId}`}
+                value={`${Platform.OS === 'web' ? window.location.origin : process.env.EXPO_PUBLIC_APP_URL || 'exp://localhost:8081/--'}/attendee?event=${activeEventId}`}
                 size={150}
               />
             </View>
