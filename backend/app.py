@@ -301,9 +301,10 @@ def _upsert_faces_batch(pairs: list[tuple]):
 
 
 def _list_drive_images(folder_id: str, subfolder: str = "") -> list[dict]:
+    svc = _get_thread_drive_service() if GOOGLE_SA_JSON else state.drive_service
     results, page_token = [], None
     while True:
-        resp = state.drive_service.files().list(
+        resp = svc.files().list(
             q=f"'{folder_id}' in parents and trashed=false",
             fields="nextPageToken, files(id, name, mimeType)",
             pageToken=page_token,
